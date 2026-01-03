@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Flask-Bcrypt
+pandas
+numpy
+nltk
+joblib
+scikit-learn
+pdfminer.six

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 fw-bold">AI-Based Resume Shortlisting</h1>
+    <p class="lead text-muted">Automate your hiring process with Intelligent Resume Screening</p>
+    <div class="mt-4">
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-2">Get Started</a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg">Login</a>
+        {% else %}
+        <a href="{{ url_for('routes.user_dashboard') }}" class="btn btn-success btn-lg">Go to Dashboard</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3 class="card-title text-center">Upload Resume</h3>
+            <p class="card-text text-center">Applicants can easily upload their resumes in PDF format.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3 class="card-title text-center">AI Analysis</h3>
+            <p class="card-text text-center">Our NLP model analyzes resumes against job descriptions.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h3 class="card-title text-center">Instant Shortlist</h3>
+            <p class="card-text text-center">Get immediate feedback on your application status.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

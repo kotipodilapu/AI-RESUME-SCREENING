@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center w-100">
+    <div class="col-lg-12">
+
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Admin Dashboard</h2>
+                <p class="text-secondary mb-0">Overview of all candidate applications</p>
+            </div>
+            <button class="btn btn-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#addJDModal">
+                <span class="me-2">+</span>Create New Job
+            </button>
+        </div>
+
+        <!-- Add JD Modal -->
+        <div class="modal fade" id="addJDModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-0">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">Create Job Description</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('routes.add_jd') }}" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Job Title</label>
+                                <input type="text" class="form-control" name="title" required
+                                    placeholder="e.g. Senior Data Scientist">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Description & Requirements</label>
+                                <textarea class="form-control" name="description" rows="6" required
+                                    placeholder="Paste the detailed job description here..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-dark">Create Job</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">All Applications</h5>
+                    <span class="badge bg-light text-dark border">{{ resumes|length }} Candidates</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Candidate</th>
+                                <th>Applied For</th>
+                                <th>Match Score</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resume in resumes %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-3 d-flex justify-content-center align-items-center"
+                                            style="width: 40px; height: 40px;">
+                                            <span class="fw-bold text-secondary">{{ resume.owner.username[:1].upper()
+                                                }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ resume.owner.username }}</div>
+                                            <div class="text-muted small">{{ resume.owner.email }}</div>
+                                            <div class="small text-primary mt-1">
+                                                <a href="#" class="text-decoration-none">View Resume</a>
+                                                <!-- Link to file if we had a route for it -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ resume.job.title }}</span>
+                                </td>
+                                <td style="width: 200px;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            {% set bg_class = 'success' if resume.score >= 70 else 'warning' if
+                                            resume.score >= 30 else 'danger' %}
+                                            <div class="progress-bar bg-{{ bg_class }}" role="progressbar"
+                                                style="width: {{ resume.score }}%" aria-valuenow="{{ resume.score }}"
+                                                aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="ms-3 fw-bold small">{{ resume.score }}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if resume.status == 'Shortlisted' %}
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success">Shortlisted</span>
+                                    {% elif resume.status == 'Rejected' %}
+                                    <span
+                                        class="badge bg-danger-subtle text-danger border border-danger">Rejected</span>
+                                    {% else %}
+                                    <span
+                                        class="badge bg-warning-subtle text-warning border border-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('routes.update_status', resume_id=resume.id) }}"
+                                        method="POST" class="d-inline">
+                                        <button type="submit" name="status" value="Shortlisted"
+                                            class="btn btn-sm btn-outline-success me-1" {{ 'disabled' if
+                                            resume.status=='Shortlisted' }} title="Shortlist Candidate">
+                                            ✓
+                                        </button>
+                                        <button type="submit" name="status" value="Rejected"
+                                            class="btn btn-sm btn-outline-danger" {{ 'disabled' if
+                                            resume.status=='Rejected' }} title="Reject Candidate">
+                                            ✕
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not resumes %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No applications received yet.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
